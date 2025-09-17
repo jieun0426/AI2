@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{top::menu}"></div>
+<head>
+    <style>
+        body {margin-bottom: 100px}
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h3>법조문 조회</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>번호</th>
+                <th>법령명</th>
+                <th>약어</th>
+                <th>분류</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item:${list}">
+            <td th:text="${item.num}"></td>
+            <td><a th:href="@{lawdetail(num=${item.num})}" th:text="${item.statute_name}" style="color: black"></a></td>
+            <td th:text="${item.statute_abbrv}"></td>
+            <td th:text="${item.statute_category}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+</body>
+
+</html>

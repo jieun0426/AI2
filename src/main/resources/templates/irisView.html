@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{top::menu}"></div>
+<body>
+<div class="container">
+    <h2>붓꽃데이터 학습 손실률과 정확도</h2>
+    <table class="table table-stripe">
+        <thead>
+        <tr>
+            <th>번호</th>
+            <th>손실률</th>
+            <th>정확도</th>
+            <th>반복횟수</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item: ${list}">
+            <td th:text="${item.num}"></td>
+            <td th:text="${item.loss}"></td>
+            <td th:text="${item.accuracy}"></td>
+            <td th:text="${item.epochs}"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{top::menu}"></div>
+<head>
+    <meta charset="UTF-8">
+    <title>의료 데이터 검색</title>
+    <style>
+        body {
+            font-family: "Noto Sans KR", sans-serif;
+            background-color: #f9f9f9;
+            padding: 30px 0;
+        }
+
+        h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+        }
+
+        .search-bar input[type="search"] {
+            padding: 8px 12px;
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .search-bar button {
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            margin-left: 8px;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 8px 20px !important;
+            text-align: center;
+            vertical-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f1f1f1;
+            font-weight: bold;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        td.content {
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+
+        .result-count {
+            font-size: 16px;
+            margin-top: 20px;
+            color: #444;
+        }
+
+        .no-result {
+            color: #888;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        .collapsible-content {
+            max-height: 4.5em; /* 약 3줄 */
+            overflow: hidden;
+            position: relative;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-content.expanded {
+            max-height: 1000em; /* 넉넉한 값으로 확장 */
+        }
+
+        .toggle-button {
+            display: block;
+            margin-top: 8px;
+            color: #007bff;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .pagination {
+            display: flex !important;
+            justify-content: center;
+            margin-top: 30px;
+            gap: 6px; /* 링크 간 간격 */
+        }
+
+        .pagination a {
+            text-decoration: none;
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .pagination a.current {
+            text-decoration: underline;
+            color: black;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h3>의료 데이터 목록</h3>
+
+    <!-- 검색 폼 -->
+    <form action="/search2" method="get" class="search-bar">
+        <label for="search">자료 검색:</label>
+        <input type="search" id="search" name="keyword" placeholder="검색어 입력" th:value="${keyword}">
+        <button type="submit">검색</button>
+    </form>
+
+    <!-- 검색결과 수 표시 -->
+    <p class="result-count" th:if="${keyword != null and count > 0}" th:text="${keyword} + ' (으)로 검색된 자료수 : ' + ${count} + '개'"></p>
+    <p class="no-result" th:if="${keyword != null and count == 0}">검색 결과가 없습니다.</p>
+
+    <!-- 결과 테이블 -->
+    <table th:if="${list != null and #lists.size(list) > 0}">
+        <thead>
+        <tr>
+            <th style="text-align: center; width: 100px; height: 2em">번호</th>
+            <th style="text-align: center;">내용</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item : ${list}">
+            <td th:text="${item.num}"></td>
+            <td class="content" style="text-align: left">
+                <div class="collapsible-content" th:id="'content-' + ${item.num}">
+                    <span th:text="${item.content}"></span>
+                </div>
+                <span class="toggle-button" th:attr="data-target='content-' + ${item.num}">더보기</span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttons = document.querySelectorAll('.toggle-button');
+
+            buttons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const targetId = this.getAttribute('data-target');
+                    const content = document.getElementById(targetId);
+
+                    if (content.classList.contains('expanded')) {
+                        content.classList.remove('expanded');
+                        this.textContent = '더보기';
+                    } else {
+                        content.classList.add('expanded');
+                        this.textContent = '접기';
+                    }
+                });
+            });
+        });
+    </script>
+
+    <!-- 페이징 -->
+    <div class="pagination" th:if="${totalPages > 1}">
+        <!-- < 10 페이지 이전 -->
+        <span th:if="${currentPage > 10}">
+            <!-- 검색 중 -->
+            <a th:if="${keyword != null}"
+               th:href="@{'/search2'(keyword=${keyword}, page=${T(java.lang.Math).max(currentPage - 10, 1)})}">&lsaquo;</a>
+
+            <!-- 전체 보기 -->
+            <a th:unless="${keyword != null}"
+               th:href="@{'/search'(page=${T(java.lang.Math).max(currentPage - 10, 1)})}">&lsaquo;</a>
+        </span>
+
+        <span th:each="i : ${#numbers.sequence(((currentPage - 1) / 10) * 10 + 1, T(java.lang.Math).min(((currentPage - 1) / 10 + 1) * 10, totalPages))}">
+            <!-- 검색 중일 때 -->
+            <a th:if="${keyword != null}"
+               th:href="@{'/search2'(keyword=${keyword}, page=${i})}"
+               th:text="${i}"
+               th:classappend="${i == currentPage} ? 'current' : ''">
+            </a>
+
+            <!-- 전체 보기일 때 -->
+            <a th:unless="${keyword != null}"
+               th:href="@{'/search'(page=${i})}"
+               th:text="${i}"
+               th:classappend="${i == currentPage} ? 'current' : ''">
+            </a>
+        </span>
+
+        <!-- > 10 페이지 이후 -->
+        <span th:if="${T(java.lang.Math).min(((currentPage - 1) / 10 + 1) * 10, totalPages) < totalPages}">
+            <!-- 검색 중 -->
+            <a th:if="${keyword != null}"
+               th:href="@{'/search2'(keyword=${keyword}, page=${T(java.lang.Math).min(((currentPage - 1) / 10 + 1) * 10 + 1, totalPages)})}">&rsaquo;</a>
+
+                    <!-- 전체 보기 -->
+            <a th:unless="${keyword != null}"
+               th:href="@{'/search'(page=${T(java.lang.Math).min(((currentPage - 1) / 10 + 1) * 10 + 1, totalPages)})}">&rsaquo;</a>
+        </span>
+
+    </div>
+</div>
+</body>
+</html>

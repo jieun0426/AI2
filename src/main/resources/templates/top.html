@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org" th:fragment="menu">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+<body>
+<header>
+    <h2 style="text-align: center" th:text="${'AI 프로젝트'}"></h2>
+</header>
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="main">Home</a></li>
+            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">시각화<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="suwon">수원시 주거현황(막대그래프)</a></li>
+                    <li><a href="suwon2">수원시 주거현황(원형차트)</a></li>
+                </ul>
+            </li>
+            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">딥러닝<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li>
+                        <!--
+                        <a href="iris">붓꽃 분류 학습 손실률과 정확도</a>
+                        -->
+                        <a href="#" onclick="submitNumber()">붓꽃 분류 학습 및 결과 저장</a>
+                    </li>
+                    <li><a href="irisview">손실률과 정확도 보기</a></li>
+                </ul>
+            </li>
+
+            <form id="hiddenForm" action="/iris" method="get" style="display:none;">
+                <input type="number" name="value" id="valueInput" />
+            </form>
+
+            <script>
+                function submitNumber() {
+                  const num = prompt("학습할 횟수를 입력하세요");
+                  if (num === null || isNaN(num) || num.trim() === "") {
+                    alert("올바른 숫자를 입력하세요.");
+                    return;
+                  }
+
+                  document.getElementById("valueInput").value = num;
+                  document.getElementById("hiddenForm").submit();
+                }
+            </script>
+
+            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">로보플로우<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a style="pointer-events: none; font-weight: bold; padding-left: 10px;">부유물 탐지</a></li>
+                    <li><a href="robo1save">결과 저장</a></li>
+                    <li><a href="robo1view">결과 보기</a></li>
+                    <li class="divider"></li>
+                    <li><a style="pointer-events: none; font-weight: bold; padding-left: 10px;">사람 인식</a></li>
+                    <li><a href="robo2save">결과 저장</a></li>
+                    <li><a href="robo2view">결과 보기</a></li>
+                    <li class="divider"></li>
+                    <li><a style="pointer-events: none; font-weight: bold; padding-left: 10px;">차량 탐지</a></li>
+                    <li><a href="robo3save">결과 저장</a></li>
+                    <li><a href="robo3view">결과 보기</a></li>
+                    <li class="divider"></li>
+                    <li><a style="pointer-events: none; font-weight: bold; padding-left: 10px;">모션 인식</a></li>
+                    <li><a href="robo4save">결과 저장</a></li>
+                    <li><a href="robo4view">결과 보기</a></li>
+                </ul>
+            </li>
+            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">자연어 처리<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a style="pointer-events: none; font-weight: bold; padding-left: 10px;">의료 데이터</a></li>
+                    <li><a href="search">데이터 보기</a></li>
+                    <li><a href="input">증상으로 치료방법 찾기</a></li>
+                    <li class="divider"></li>
+                    <li><a style="pointer-events: none; font-weight: bold; padding-left: 10px;">민사법 데이터</a></li>
+                    <li><a href="lawlist">법조문 조회</a></li>
+                    <li><a href="judglist">판결문 조회</a></li>
+                </ul>
+            </li>
+            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">음성 처리<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="tts">텍스트→음성 변환</a></li>
+                    <li><a href="stt">음성→텍스트 변환</a></li>
+                </ul>
+            </li>
+            <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">치매환자 판별<span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="ad">치매환자 학습 결과 저장</a></li>
+                    <li><a href="data/training_report.pdf">결과물 pdf로 보기</a></li>
+                </ul>
+            </li>
+            <li><a href="carnumber">차량 번호 인식</a></li>
+        </ul>
+    </div>
+</nav>
+
+
+
+</body>
+
+</html>

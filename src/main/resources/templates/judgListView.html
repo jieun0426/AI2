@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{top::menu}"></div>
+<head>
+    <style>
+        body {margin-bottom: 100px}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            table-layout: fixed; /* 각 열 너비를 균등하게 배분 */
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            vertical-align: top;
+            word-wrap: break-word;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        /* 각 열별 너비 설정 (예시: % 단위로 균형 조정) */
+        .col-doc-id        { width: 25%; }
+        .col-case-name     { width: 15%; }
+        .col-court         { width: 20%; }
+        .col-case-type     { width: 10%; }
+        .col-announce-date { width: 30%; }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h3>판결문 조회</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>문서번호</th>
+                <th>사건명</th>
+                <th>법원명</th>
+                <th>사건종류</th>
+                <th>선고일</th>
+            </tr>
+        </thead>
+        <tbody>
+        <tr th:each="item:${list}">
+            <td><a th:href="@{judgdetail(doc_id=${item.doc_id})}" th:text="${item.doc_id}" style="color: black"></a></td>
+            <td><a th:href="@{judgdetail(doc_id=${item.doc_id})}" th:text="${item.casenames}" style="color: black"></a></td>
+            <td th:text="${item.normalized_court}"></td>
+            <td th:text="${item.casetype}"></td>
+            <td th:text="${item.announce_date}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <style>
+        .current {
+            font-weight: bold;
+            text-decoration: underline;
+            color: #007bff;
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+            margin: 0 3px;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+
+        input[type=number] {
+            width: 80px;
+            padding: 3px;
+        }
+    </style>
+
+
+    <!-- 페이징 바 -->
+    <div style="text-align: center; margin-top: 20px;">
+        <!-- << 100페이지 이전 -->
+        <span th:if="${currentPage > 100}">
+        <a th:href="@{/judglist(page=${T(java.lang.Math).max(currentPage - 100, 1)})}">&laquo;</a>
+    </span>
+
+        <!-- < 10페이지 이전 -->
+        <span th:if="${currentPage > 10}">
+        <a th:href="@{/judglist(page=${T(java.lang.Math).max(currentPage - 10, 1)})}">&lsaquo;</a>
+    </span>
+
+        <!-- 페이지 번호 (10개씩 블럭) -->
+        <span th:each="i : ${#numbers.sequence(((currentPage - 1) / 10) * 10 + 1, T(java.lang.Math).min(((currentPage - 1) / 10 + 1) * 10, totalPages))}">
+        <a th:href="@{/judglist(page=${i})}"
+           th:text="${i}"
+           th:classappend="${i == currentPage} ? 'current' : ''"
+           style="margin: 0 5px; text-decoration: none; font-weight: bold; text-decoration: [[${i == currentPage} ? 'underline' : 'none']]">
+        </a>
+    </span>
+
+        <!-- > 10페이지 이후 -->
+        <span th:if="${currentPage + 10 <= totalPages}">
+        <a th:href="@{/judglist(page=${T(java.lang.Math).min(currentPage + 10, totalPages)})}">&rsaquo;</a>
+    </span>
+
+        <!-- >> 100페이지 이후 -->
+        <span th:if="${currentPage + 100 <= totalPages}">
+        <a th:href="@{/judglist(page=${T(java.lang.Math).min(currentPage + 100, totalPages)})}">&raquo;</a>
+    </span>
+    </div>
+
+    <!-- 직접 입력 페이지 이동 -->
+    <div style="text-align: center; margin-top: 20px;">
+        <form action="/judglist" method="get">
+            <label for="pageInput">페이지 이동:</label>
+            <input type="number" id="pageInput" name="page" min="1" th:attr="max=${totalPages}" required>
+            <button type="submit">이동</button>
+        </form>
+    </div>
+</div>
+
+
+</body>
+
+</html>

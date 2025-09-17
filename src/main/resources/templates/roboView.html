@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{top::menu}"></div>
+<body>
+<div class="container">
+    <h2 th:text="${text}"></h2>
+    <video width="720" controls>
+        <source th:src="'/data/video/'+${video}" type="video/mp4">
+        브라우저가 video 태그를 지원하지 않습니다.
+    </video>
+</div>
+
+</body>
+
+</html>

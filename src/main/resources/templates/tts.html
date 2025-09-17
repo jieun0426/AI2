@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{top::menu}"></div>
+<body>
+<div class="container">
+    <h2>텍스트 음성 변환</h2><br>
+    <form id="ttsForm" action="python/ttsin" method="post">
+        텍스트 : <input type="text" placeholder="텍스트를 입력해주세요" name="txt" required>
+        <button type="submit">변환</button>
+    </form>
+    <br>
+    <div id="audioContainer">
+        <!-- 여기에 JS로 오디오 삽입 -->
+    </div>
+</div>
+
+<script>
+    // form 전송 후 오디오 로딩 시작
+    document.getElementById('ttsForm').addEventListener('submit', function (e) {
+        e.preventDefault();  // 폼 기본 제출 막기
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const text = formData.get("txt");
+
+        fetch("/python/ttsin", {
+            method: "POST",
+            body: formData
+        }).then(() => {
+            // 오디오 로딩 시작
+            waitForAudio();
+        });
+    });
+
+    function waitForAudio() {
+        const basePath = "/data/tts_output.mp3";
+        const uniquePath = basePath + "?ts=" + Date.now(); // 캐시 방지
+        const audioContainer = document.getElementById("audioContainer");
+
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        const interval = setInterval(() => {
+            fetch(uniquePath, { method: 'HEAD' })
+                .then(res => {
+                    if (res.ok) {
+                        clearInterval(interval);
+                        audioContainer.innerHTML = `
+                            <audio controls>
+                                <source src="${uniquePath}" type="audio/mpeg">
+                                브라우저가 오디오를 지원하지 않습니다.
+                            </audio>`;
+                    } else {
+                        attempts++;
+                        if (attempts >= maxAttempts) {
+                            clearInterval(interval);
+                            audioContainer.innerHTML = "<p>음성 파일을 불러올 수 없습니다.</p>";
+                        }
+                    }
+                })
+                .catch(() => {
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        clearInterval(interval);
+                        audioContainer.innerHTML = "<p>음성 파일을 불러오는 중 오류 발생</p>";
+                    }
+                });
+        }, 1000);
+    }
+</script>
+
+</body>
+
+</html>
